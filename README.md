@@ -13,3 +13,10 @@ Before cloning this project,you need to do these things at first:\
 ### Note: 
 the vgg19 codes and npy file are adapted from [machrisaa/tensorflow-vgg](https://github.com/machrisaa/tensorflow-vgg).
  
+## How to run this project:
+1.`python pretrain.py`\
+2.`python train.py`
+
+### Note:
+1.You can change the batch size, iterating steps and learning rate to adapt your computing resources.The default setup in code is run under system with a single TELSA K80 GPU and multi-cpu,and it takes about 6 minutes for every 100 steps of pretraining and 8 mins for formal training.\
+2.testing code and trained parameter files are temporarily unavailable. 
