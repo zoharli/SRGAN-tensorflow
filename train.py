@@ -63,7 +63,7 @@ with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         sess.run(tf.local_variables_initializer())
         loader = tf.train.Saver(var_list=var_list)
-        loader.restore(sess,'save/srResNet4x.ckpt')
+        loader.restore(sess,'./save/srResNet_b64_r64_v0.001/srResNet4x.ckpt')
         saver=tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
         saver.save(sess,save_path+'/srgan.ckpt')
         print('saved')
