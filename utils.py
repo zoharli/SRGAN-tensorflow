@@ -1,4 +1,6 @@
 import tensorflow as tf
+from math import sqrt
+import numpy as np
 
 def conv_layer(input,filter,stride,name='conv'):
     with tf.variable_scope(name):
@@ -17,4 +19,24 @@ def leaky_relu(x,alpha=0.1,name='lrelu'):
      with tf.name_scope(name):
          x=tf.maximum(x,alpha*x)
          return x
-
+def batch_mse_psnr(dbatch):
+    im1,im2=np.split(dbatch,2)
+    mse=((im1-im2)**2).mean(axis=(1,2))
+    psnr=np.mean(20*np.log10(255.0/np.sqrt(mse)))
+    return np.mean(mse),psnr
+def batch_ssim(dbatch):
+    im1,im2=np.split(dbatch,2)
+    imgsize=im1.shape[1]*im1.shape[2]
+    avg1=im1.mean((1,2),keepdims=1)
+    avg2=im2.mean((1,2),keepdims=1)
+    std1=im1.std((1,2),ddof=1)
+    std2=im2.std((1,2),ddof=1)
+    cov=((im1-avg1)*(im2-avg2)).mean((1,2))*imgsize/(imgsize-1)
+    avg1=np.squeeze(avg1)
+    avg2=np.squeeze(avg2)
+    k1=0.01
+    k2=0.03
+    c1=(k1*255)**2
+    c2=(k2*255)**2
+    c3=c2/2
+    return np.mean((2*avg1*avg2+c1)*2*(cov+c3)/(avg1**2+avg2**2+c1)/(std1**2+std2**2+c2))
