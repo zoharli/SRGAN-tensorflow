@@ -22,8 +22,8 @@ class srResNet:
     def residual_block(self,input,name='block'):
         with tf.variable_scope(name):
             conv1=conv_layer(input,conv_filter([3,3,64,64]),1)
-            bn1=batch_norm(conv1,name='bn1') if self.train_mode else conv1
+            bn1=batch_norm(conv1) if self.train_mode else conv1
             relu=tf.nn.relu(bn1)
-            conv2=conv_layer(conv1,conv_filter([3,3,64,64]),1)
-            bn2=batch_norm(conv2,name='bn2') if self.train_mode else conv2
+            conv2=conv_layer(relu,conv_filter([3,3,64,64]),1)
+            bn2=batch_norm(conv2) if self.train_mode else conv2
             return tf.add(input,bn2)
