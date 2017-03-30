@@ -7,7 +7,7 @@ A complete tensorflow implementation of SRGAN as proposed in following paper:\
 ## Dependencies:
   `tensorflow version>=r1.0`
  
-## How to run this project:
+## Usage:
   1. run`$ git clone https://github.com/zoharli/SRGAN-tensorflow`
   2. Get data(images for training and testing) ready,the way of loading image data is specified in `pretrain.py`.You can either use raw jpeg format data (as default in this project),or use [tfRecord](https://www.tensorflow.org/api_guides/python/python_io#tfrecords_format_details) file format which is faster in loading data.
   3. download [VGG19 npy](https://mega.nz/#!xZ8glS6J!MAnE91ND_WyfZ_8mvkuSa2YcA7q-1ehfSm-Q1fxOvvs) and put it in the main directory of this project.
