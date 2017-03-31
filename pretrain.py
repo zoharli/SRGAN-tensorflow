@@ -13,10 +13,12 @@ filenames='r256-512.bin' #put images' paths to this file,one image path for each
 total_steps=int(2e5)
 log_steps=100 #interval to save the model parameters
 
+if not os.path.exists('save'):
+    os.mkdir('save')
+
 save_path='save/srResNet_'+flags
 if not os.path.exists(save_path):
     os.mkdir(save_path)
-
 
 def read(filenames):
     file_names=open(filenames,'rb').read().split('\n')
