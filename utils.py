@@ -1,5 +1,4 @@
 import tensorflow as tf
-from math import sqrt
 import numpy as np
 
 def conv_layer(input,filter,stride,name='conv'):
