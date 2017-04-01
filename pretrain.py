@@ -5,7 +5,7 @@ import random
 import os 
 from utils import *
 
-learn_rate=0.01 #recommended
+learn_rate=0.01 
 batch_size=64 #recommended
 resolution=64 #downsampled image resolution, in this case 64x64
 flags='b'+str(batch_size)+'_r'+str(resolution)+'_v'+str(learn_rate)#set for practicers to try different setups 
@@ -43,9 +43,9 @@ with tf.Session() as sess:
     if not os.path.exists(save_path+'/srResNet.ckpt.meta'):
         sess.run(tf.local_variables_initializer())
         sess.run(tf.global_variables_initializer())
-        saver=tf.train.Saver()
+        saver=tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
         saver.save(sess,save_path+'/srResNet.ckpt')
-    saver=tf.train.Saver()
+    saver=tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
     saver.restore(sess,save_path+'/srResNet.ckpt')
     sess.run(tf.local_variables_initializer())
     tf.train.start_queue_runners()

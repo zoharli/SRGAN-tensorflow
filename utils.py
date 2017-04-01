@@ -2,9 +2,9 @@ import tensorflow as tf
 from math import sqrt
 import numpy as np
 
-def conv_layer(input,filter,stride,name='conv'):
+def conv_layer(input,filter_shape,stride,name='conv'):
     with tf.variable_scope(name):
-        conv=tf.nn.conv2d(input,filter,strides=[1,stride,stride,1],padding='SAME')
+        conv=tf.nn.conv2d(input,conv_filter(,strides=[1,stride,stride,1],padding='SAME')
         bias=tf.Variable(tf.zeros(conv.shape.as_list()[3]),name='bias')
         return tf.nn.bias_add(conv,bias)
 def batch_norm(input,name='BN'):

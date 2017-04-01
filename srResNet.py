@@ -9,7 +9,7 @@ class srResNet:
             block=[]
             for i in xrange(16):
                 block.append(self.residual_block(block[-1] if i else relu1))
-            conv2=conv_layer(block[len(block)-1],conv_filter([3,3,64,64]),1)
+            conv2=conv_layer(block[-1],conv_filter([3,3,64,64]),1)
             bn1=batch_norm(conv2) if self.train_mode else conv2
             added=tf.add(bn1,relu1)
             conv3=conv_layer(added,conv_filter([3,3,64,256]),1)
