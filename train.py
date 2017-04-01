@@ -30,7 +30,7 @@ def read(filenames):
     image=tf.image.decode_jpeg(value)
     cropped=tf.random_crop(image,[resolution*4,resolution*4,3])
     random_flipped=tf.image.random_flip_left_right(cropped)
-    minibatch=tf.train.batch([random_flipped],batch_size,capacity=300)
+    minibatch=tf.cast(tf.train.batch([random_flipped],batch_size,capacity=300),tf.float32)
     rescaled=tf.image.resize_bicubic(minibatch,[resolution,resolution])
     return minibatch,rescaled
 
@@ -40,11 +40,11 @@ with tf.device('/cpu:0'):
 resnet=srResNet.srResNet(rescaled)
 var_list=tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
 
-dbatch=tf.concat([tf.cast(minibatch,tf.float32),resnet.conv5],0)
+dbatch=tf.concat([minibatch,resnet.conv5],0)
 vgg=vgg19.Vgg19()
 vgg.build(dbatch)
 fmap=tf.split(vgg.conv5_4,2)
-content_loss=tf.reduce_mean(tf.squared_difference(fmap[0],fmap[1]))
+content_loss=tf.mean_squared_error(fmap[0],fmap[1])
 
 disc=discriminator.Discriminator(dbatch)
 D_x,D_G_z=tf.split(tf.squeeze(disc.dense2),2)   
