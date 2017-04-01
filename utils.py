@@ -15,7 +15,7 @@ def batch_norm(input,name='BN'):
                                   name=name)[0]
 def conv_filter(shape,name='filter'):
     #initialize weights as the way proposed in [He et.cl.:Delving_Deep_into_rectifiers_ICCV_2015_paper]
-    return tf.Variable(tf.random_normal(shape,stddev=np.sqrt(2.0/shape[0]/shape[1]/shape[2])),name=name)
+    return tf.Variable(tf.random_normal(shape,stddev=np.sqrt(2.0/shape[0]/shape[1]/(shape[2]+shape[3])*2)),name=name)
 def leaky_relu(x,alpha=0.1,name='lrelu'):
      with tf.name_scope(name):
          x=tf.maximum(x,alpha*x)
