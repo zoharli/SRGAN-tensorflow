@@ -3,17 +3,19 @@ import numpy as np
 
 def conv_layer(input,filter_shape,stride,name='conv'):
     with tf.variable_scope(name):
-        conv=tf.nn.conv2d(input,conv_filter(,strides=[1,stride,stride,1],padding='SAME')
+        conv=tf.nn.conv2d(input,conv_filter(filter_shape),strides=[1,stride,stride,1],padding='SAME')
         bias=tf.Variable(tf.zeros(conv.shape.as_list()[3]),name='bias')
         return tf.nn.bias_add(conv,bias)
 def batch_norm(input,name='BN'):
     ch_num=input.shape.as_list()[3]
-    return tf.nn.fused_batch_norm(input,
-                                  offset=tf.Variable(tf.zeros(ch_num),name=name+'/offset'),
-                                  scale=tf.Variable(tf.ones(ch_num),name=name+'/scale'),
+    with tf.variable_scope(name):
+        return tf.nn.fused_batch_norm(input,
+                                  offset=tf.Variable(tf.zeros(ch_num),name='offset'),
+                                  scale=tf.Variable(tf.ones(ch_num),name='scale'),
                                   name=name)[0]
 def conv_filter(shape,name='filter'):
-    return tf.Variable(tf.truncated_normal(shape),name=name)
+    #initialize weights as the way proposed in [He et.cl.:Delving_Deep_into_rectifiers_ICCV_2015_paper]
+    return tf.Variable(tf.random_normal(shape,stddev=np.sqrt(2.0/shape[0]/shape[1]/shape[2])),name=name)
 def leaky_relu(x,alpha=0.1,name='lrelu'):
      with tf.name_scope(name):
          x=tf.maximum(x,alpha*x)

@@ -12,6 +12,7 @@ batch_size=16
 resolution=64
 flags='b'+str(batch_size)+'_'+'r'+str(resolution)# 'v' means learning_rate
 filenames='r256-512.bin'
+srResNet_path='./save/srResNet_b64_r64_v0.01/srResNet4x.ckpt'
 log_steps=50
 endpoint1=20000
 endpoint2=40000
@@ -63,7 +64,7 @@ with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         sess.run(tf.local_variables_initializer())
         loader = tf.train.Saver(var_list=var_list)
-        loader.restore(sess,'./save/srResNet_b64_r64_v0.001/srResNet4x.ckpt')
+        loader.restore(sess,srResNet_path)
         saver=tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
         saver.save(sess,save_path+'/srgan.ckpt')
         print('saved')

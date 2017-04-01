@@ -36,7 +36,7 @@ def read(filenames):
 with tf.device('/cpu:0'):
     minibatch,rescaled=read(filenames)
 resnet=srResNet.srResNet(rescaled)
-MSE=tf.reduce_mean(tf.squared_difference(minibatch,resnet.conv5))
+MSE=tf.losses.mean_squared_error(minibatch,resnet.conv5)
 global_step=tf.Variable(0,name='global_step')
 train_step=tf.train.AdamOptimizer(learn_rate).minimize(MSE,global_step)
 dbatch=tf.concat([minibatch,resnet.conv5],0)
@@ -61,7 +61,7 @@ with tf.Session() as sess:
             ssim=batch_ssim(d_batch)
             s=time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))+':step '+str(step())+' mse:'+str(mse)+' psnr:'+str(psnr)+' ssim:'+str(ssim)  
             print(s)
-            f=open('pretrain_'+flags+'.txt','a')
+            f=open('info.pretrain_'+flags,'a')
             f.write(s+'\n')
             f.close()
             save()
