@@ -44,7 +44,7 @@ dbatch=tf.concat([minibatch,resnet.conv5],0)
 vgg=vgg19.Vgg19()
 vgg.build(dbatch)
 fmap=tf.split(vgg.conv5_4,2)
-content_loss=tf.mean_squared_error(fmap[0],fmap[1])
+content_loss=tf.losses.mean_squared_error(fmap[0],fmap[1])
 
 disc=discriminator.Discriminator(dbatch)
 D_x,D_G_z=tf.split(tf.squeeze(disc.dense2),2)   
