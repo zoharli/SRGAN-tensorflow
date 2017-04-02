@@ -4,7 +4,7 @@ from utils import *
 class Discriminator:
     def __init__(self,input,name='disc'):
         with tf.variable_scope(name):
-            conv1=conv_layer(input,conv_filter([3,3,3,64]),1)
+            conv1=conv_layer(input,[3,3,3,64],1)
             lrelu1=leaky_relu(conv1)
             ochannels=[64,128,128,256,256,512,512]
             stride=[2,1]
@@ -20,7 +20,7 @@ class Discriminator:
                                    activation=tf.sigmoid)
     def get_block(self,X,ochannels,stride,name='block'):
         with tf.variable_scope(name):
-            X=conv_layer(X,conv_filter([3,3,X.shape.as_list()[3],ochannels]),stride)
+            X=conv_layer(X,[3,3,X.shape.as_list()[3],ochannels],stride)
             X=leaky_relu(X)
             X=batch_norm(X)
             return X
