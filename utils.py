@@ -25,6 +25,13 @@ def batch_mse_psnr(dbatch):
     mse=((im1-im2)**2).mean(axis=(1,2))
     psnr=np.mean(20*np.log10(255.0/np.sqrt(mse)))
     return np.mean(mse),psnr
+def batch_y_psnr(dbatch):
+    r,g,b=np.split(dbatch,3,axis=3)
+    y=np.squeeze(0.3*r+0.59*g+0.11*b)
+    im1,im2=np.split(y,2)
+    mse=((im1-im2)**2).mean(axis=(1,2))
+    psnr=np.mean(20*np.log10(255.0/np.sqrt(mse)))
+    return psnr
 def batch_ssim(dbatch):
     im1,im2=np.split(dbatch,2)
     imgsize=im1.shape[1]*im1.shape[2]
