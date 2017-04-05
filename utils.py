@@ -1,38 +1,28 @@
 import tensorflow as tf
 import numpy as np
 
-def conv_layer(input,filter_shape,stride,name='conv'):
-    with tf.variable_scope(name):
-        conv=tf.nn.conv2d(input,conv_filter(filter_shape),strides=[1,stride,stride,1],padding='SAME')
-        bias=tf.Variable(tf.zeros(conv.shape.as_list()[3]),name='bias')
-        return tf.nn.bias_add(conv,bias)
-def batch_norm(input,name='BN'):
-    ch_num=input.shape.as_list()[3]
-    with tf.variable_scope(name):
-        return tf.nn.fused_batch_norm(input,
-                                  offset=tf.Variable(tf.zeros(ch_num),name='offset'),
-                                  scale=tf.Variable(tf.ones(ch_num),name='scale'),
-                                  name=name)[0]
-def conv_filter(shape,name='filter'):
-    #initialize weights as the way proposed in [He et.cl.:Delving_Deep_into_rectifiers_ICCV_2015_paper]
-    return tf.Variable(tf.random_normal(shape,stddev=np.sqrt(2.0/shape[0]/shape[1]/(shape[2]+shape[3])*2)),name=name)
+def conv_layer(inputs,ochannels,ksize,stride=1,activation=None,name='conv'):
+    return tf.layers.conv2d(inputs,ochannels,ksize,stride,'same',activation=activation,kernel_initializer=tf.random_normal_initializer(0,np.sqrt(2.0/ksize/ksize/(inputs.shape.as_list()[3]+ochannels)*2)),name=name)#msra initialization
+def batch_norm(inputs,training=True):
+    return tf.layers.batch_normalization(inputs,training=training)
 def leaky_relu(x,alpha=0.1,name='lrelu'):
-     with tf.name_scope(name):
-         x=tf.maximum(x,alpha*x)
-         return x
+    return tf.maximum(x,alpha*x,name=name)
 def batch_mse_psnr(dbatch):
+    dbatch=dbatch[:,4:-4,4:-4,:]
     im1,im2=np.split(dbatch,2)
     mse=((im1-im2)**2).mean(axis=(1,2))
     psnr=np.mean(20*np.log10(255.0/np.sqrt(mse)))
     return np.mean(mse),psnr
 def batch_y_psnr(dbatch):
+    dbatch=dbatch[:,4:-4,4:-4,:]
     r,g,b=np.split(dbatch,3,axis=3)
-    y=np.squeeze(0.3*r+0.59*g+0.11*b)
+    y=16+np.squeeze(0.183*r+0.614*g+0.06*b)
     im1,im2=np.split(y,2)
     mse=((im1-im2)**2).mean(axis=(1,2))
     psnr=np.mean(20*np.log10(255.0/np.sqrt(mse)))
     return psnr
 def batch_ssim(dbatch):
+    dbatch=dbatch[:,4:-4,4:-4,:]
     im1,im2=np.split(dbatch,2)
     imgsize=im1.shape[1]*im1.shape[2]
     avg1=im1.mean((1,2),keepdims=1)

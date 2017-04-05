@@ -6,21 +6,23 @@ import os
 from utils import *
 import vgg19
 
-learn_rate=0.001
-batch_size=32 #recommended
+learn_rate=0.0001
+batch_size=16 #recommended
 resolution=64 #downsampled image resolution, in this case 64x64
-flags='b'+str(batch_size)+'_r'+str(resolution)+'_v'+str(learn_rate)+'_leaky_tanh'#set for practicers to try different setups 
+flags='b'+str(batch_size)+'_r'+str(resolution)+'_v'+str(learn_rate)+'_ori'#set for practicers to try different setups 
 filenames='r256-512.bin' #put images' paths to this file,one image path for each row,e.g. ./data/123.JPEG, or define another way of loading images in read()
 total_steps=int(10e5)
-log_steps=50 #interval to save the model parameters
-
-if not os.path.exists('save'):
-    os.mkdir('save')
-
+save_steps=50
+log_steps=10 #interval to save the model parameters
+log_dir='./log'
 save_path='save/srResNet_'+flags
-if not os.path.exists(save_path):
-    os.mkdir(save_path)
 
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+if not os.path.exists(save_path):
+    os.makedirs(save_path)
+
+16
 def read(filenames):
     file_names=open(filenames,'rb').read().split('\n')
     random.shuffle(file_names)
@@ -32,17 +34,20 @@ def read(filenames):
     random_flipped=tf.image.random_flip_left_right(cropped)
     minibatch=tf.cast(tf.train.batch([random_flipped],batch_size,capacity=300),tf.float32)
     rescaled=tf.image.resize_bicubic(minibatch,[resolution,resolution])
-    rescaled=rescaled*2/255-1
     return minibatch,rescaled
 
 with tf.device('/cpu:0'):
     minibatch,rescaled=read(filenames)
 resnet=srResNet.srResNet(rescaled)
-result=(tf.tanh(resnet.conv5)+1)*255/2
+result=resnet.conv5
 dbatch=tf.concat([minibatch,result],0)
+tf.summary.image('SR'+flags,result,16)
+tf.summary.image('HR'+flags,minibatch,16)
 MSE=tf.losses.mean_squared_error(minibatch,result)
-global_step=tf.Variable(0,name='global_step')
+global_step=tf.Variable(0,trainable=0,name='global_step')
 train_step=tf.train.AdamOptimizer(learn_rate).minimize(MSE,global_step)
+
+merged = tf.summary.merge_all()
 
 with tf.Session() as sess:
     if not os.path.exists(save_path+'/srResNet.ckpt.meta'):
@@ -50,6 +55,7 @@ with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         saver=tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
         saver.save(sess,save_path+'/srResNet.ckpt')
+    train_writer = tf.summary.FileWriter(log_dir,sess.graph)
     saver=tf.train.Saver(var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
     saver.restore(sess,save_path+'/srResNet.ckpt')
     sess.run(tf.local_variables_initializer())
@@ -58,7 +64,7 @@ with tf.Session() as sess:
         saver.save(sess,save_path+'/srResNet.ckpt')
     step=global_step.eval
     while step()<=total_steps:
-        if(step()%log_steps==0):
+        if(step()%save_steps==0):
             d_batch=dbatch.eval()
             mse,psnr=batch_mse_psnr(d_batch)
             ypsnr=batch_y_psnr(d_batch)
@@ -69,6 +75,10 @@ with tf.Session() as sess:
             f.write(s+'\n')
             f.close()
             save()
-        sess.run(train_step)
+        if(step()%log_steps==0):
+            summary,_=sess.run([merged,train_step])
+            train_writer.add_summary(summary,step())
+        else:
+            sess.run(train_step)
 
 print('done')
