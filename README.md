@@ -22,6 +22,10 @@ A complete tensorflow implementation of SRGAN as proposed in following paper:\
 
 ## Benchmark
   * srResNet-mse psnr=24dB 
+  
+## TODO
+  * Debug the model and improve the psnr of srResNet-mse.
+  * Train the SRGAN.
 #### update 20/3/17：
  * Psnr and ssim assessment are added.
  * Automatic saving and loading are enabled.
