@@ -20,8 +20,6 @@ A complete tensorflow implementation of SRGAN as proposed in following paper:\
 3. The vgg19 codes and npy file are adapted from [machrisaa/tensorflow-vgg](https://github.com/machrisaa/tensorflow-vgg).
 4. I used [least square loss](https://pdfs.semanticscholar.org/0bbc/35bdbd643fb520ce349bdd486ef2c490f1fc.pdf) to substitute the original cross entropy loss function as adversarial loss.The decent weight leverage between content loss and adversarial loss(least suqare loss) are temporarily not provided.You can either try different weights or just use the cross entropy loss and set the weights as presented in the original paper.
 
-## Benchmark
-  * srResNet-mse psnr=24dB 
   
 ## TODO
   * Debug the model and improve the psnr of srResNet-mse.
